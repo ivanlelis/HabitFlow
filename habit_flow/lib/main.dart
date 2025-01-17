@@ -6,7 +6,8 @@ import 'package:habit_flow/home/home.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp(); // Initialize Firebase
+  await Firebase.initializeApp();
+  print('Firebase Initialized');
   runApp(MyApp());
 }
 
@@ -16,20 +17,33 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'HabitFlow',
       theme: ThemeData(primarySwatch: Colors.blue),
-      home: StreamBuilder<User?>(
-        stream: FirebaseAuth.instance.authStateChanges(),
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return CircularProgressIndicator();
-          } else if (snapshot.hasError) {
-            return Text('Something went wrong!');
-          } else if (snapshot.hasData) {
-            return Home(); // Show HomeScreen if logged in
-          } else {
-            return LoginScreen(); // Show LoginScreen if not logged in
-          }
-        },
-      ),
+      home: AuthWrapper(), // Use a wrapper for user authentication check
+    );
+  }
+}
+
+class AuthWrapper extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    // Stream to monitor the user's authentication status
+    return StreamBuilder<User?>(
+      stream: FirebaseAuth.instance.authStateChanges(),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return Scaffold(
+            body: Center(
+                child: CircularProgressIndicator()), // Splash loading indicator
+          );
+        } else if (snapshot.hasError) {
+          return Scaffold(
+            body: Center(child: Text('Something went wrong!')),
+          );
+        } else if (snapshot.hasData) {
+          return Home(); // Navigate to HomePage if user is authenticated
+        } else {
+          return LoginScreen(); // Navigate to LoginScreen if user is not authenticated
+        }
+      },
     );
   }
 }
