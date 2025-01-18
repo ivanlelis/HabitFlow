@@ -1,12 +1,15 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:habit_flow/user_authentication/sign_up.dart';
 
-class LoginScreen extends StatefulWidget {
+class Login extends StatefulWidget {
+  const Login({super.key});
+
   @override
-  _LoginScreenState createState() => _LoginScreenState();
+  _LoginState createState() => _LoginState();
 }
 
-class _LoginScreenState extends State<LoginScreen> {
+class _LoginState extends State<Login> {
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
@@ -20,23 +23,6 @@ class _LoginScreenState extends State<LoginScreen> {
         password: _passwordController.text.trim(),
       );
       // Navigate to Home after successful login
-      Navigator.pushReplacementNamed(
-          context, '/home'); // You can create a Home screen
-    } on FirebaseAuthException catch (e) {
-      setState(() {
-        _errorMessage = e.message ?? "An error occurred";
-      });
-    }
-  }
-
-  // Sign-up function
-  Future<void> _signup() async {
-    try {
-      await _auth.createUserWithEmailAndPassword(
-        email: _emailController.text.trim(),
-        password: _passwordController.text.trim(),
-      );
-      // Navigate to Home after successful signup
       Navigator.pushReplacementNamed(context, '/home');
     } on FirebaseAuthException catch (e) {
       setState(() {
@@ -72,9 +58,14 @@ class _LoginScreenState extends State<LoginScreen> {
               child: Text("Login"),
             ),
             SizedBox(height: 10),
-            ElevatedButton(
-              onPressed: _signup,
-              child: Text("Sign Up"),
+            TextButton(
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => SignUp()),
+                );
+              },
+              child: Text("Don't have an account? Sign Up"),
             ),
           ],
         ),
