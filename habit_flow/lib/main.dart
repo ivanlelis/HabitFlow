@@ -13,33 +13,39 @@ void main() async {
 }
 
 class MyApp extends StatelessWidget {
+  const MyApp({super.key});
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'HabitFlow',
       theme: ThemeData(primarySwatch: Colors.blue),
-      home: FutureBuilder(
-        future: _checkFirstLaunch(),
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return Center(child: CircularProgressIndicator());
-          } else if (snapshot.hasError) {
-            return Scaffold(
-              body: Center(child: Text('Something went wrong!')),
-            );
-          } else {
-            if (snapshot.data == true) {
-              return Onboarding();
-            } else {
-              return AuthWrapper(); // Continue as normal with auth wrapper
-            }
-          }
-        },
-      ),
+      initialRoute: '/',
+      routes: {
+        '/': (context) => FutureBuilder(
+              future: _checkFirstLaunch(),
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return Center(child: CircularProgressIndicator());
+                } else if (snapshot.hasError) {
+                  return Scaffold(
+                    body: Center(child: Text('Something went wrong!')),
+                  );
+                } else {
+                  if (snapshot.data == true) {
+                    return Onboarding();
+                  } else {
+                    return AuthWrapper(); // Continue as normal with auth wrapper
+                  }
+                }
+              },
+            ),
+        '/home': (context) => Home(),
+        '/login': (context) => Login(),
+      },
     );
   }
 
-  // Check if it's the user's first time using the app
   Future<bool> _checkFirstLaunch() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     bool? seen = prefs.getBool('seen');
@@ -48,6 +54,8 @@ class MyApp extends StatelessWidget {
 }
 
 class AuthWrapper extends StatelessWidget {
+  const AuthWrapper({super.key});
+
   @override
   Widget build(BuildContext context) {
     return StreamBuilder<User?>(
